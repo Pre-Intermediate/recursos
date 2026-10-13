@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teaching Resources Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#003c71; --azul-claro:#0072ce; --fondo:#f1f5f9; --blanco:#ffffff;
+    --texto:#1e293b; --gris:#64748b; --borde:#e2e8f0; --verde:#0f8a5f; --rojo:#dc2626; --ambar:#b45309;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Montserrat',system-ui,sans-serif;background:var(--fondo);color:var(--texto);min-height:100vh}
+  .hidden{display:none !important}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight:600;font-size:.85rem;transition:opacity .15s, transform .15s}
+  button:hover{opacity:.88}
+  button:disabled{opacity:.5;cursor:wait}
+  .btn-prim{background:var(--azul);color:#fff}
+  .btn-sec{background:#fff;color:var(--azul);border:1px solid var(--borde)}
+  .btn-peligro{background:#fff;color:var(--rojo);border:1px solid #fecaca}
+  .btn-barra{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);padding:7px 12px}
+  .btn-barra.activo{background:rgba(255,255,255,.18)}
+  input[type=text],textarea{width:100%;font-family:inherit;font-size:.95rem;padding:10px 12px;border:1px solid var(--borde);border-radius:8px;background:#fff;color:var(--texto)}
+  textarea{resize:vertical;min-height:90px}
+  label.campo{display:block;font-weight:600;font-size:.85rem;color:var(--azul);margin:14px 0 6px}
+  .ayuda{font-size:.78rem;color:var(--gris);margin-top:4px}
+
+  /* Aviso modo demostración */
+  #aviso-demo{background:#fef3c7;color:#78350f;text-align:center;font-size:.82rem;padding:8px 16px;font-weight:500}
+
+  /* Barra superior */
+  #barra{background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px;flex-wrap:wrap;min-height:60px}
+  .marca{font-weight:700;letter-spacing:.4px;font-size:1rem}
+  .nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .chip{background:rgba(255,255,255,.18);padding:4px 10px;border-radius:999px;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px}
+  #u-email{font-size:.8rem;opacity:.85}
+
+  main{max-width:1100px;margin:0 auto;padding:28px 20px}
+  h2{color:var(--azul);margin:0 0 6px;font-size:1.4rem}
+  .sub{color:var(--gris);margin:0 0 24px;font-size:.92rem}
+
+  /* Ingreso */
+  #p-ingreso{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 40px);padding:20px}
+  .tarjeta-ingreso{background:#fff;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:40px 36px;max-width:440px;width:100%;text-align:center}
+  .tarjeta-ingreso h1{color:var(--azul);font-size:1.45rem;margin:0 0 8px}
+  .tarjeta-ingreso p{color:var(--gris);font-size:.9rem;margin:0 0 26px;line-height:1.5}
+  .btn-google{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--texto);border:1px solid #cbd5e1;padding:12px 22px;font-size:.95rem}
+  .btn-google svg{width:20px;height:20px}
+  .error{background:#fef2f2;color:var(--rojo);border:1px solid #fecaca;border-radius:10px;padding:12px;font-size:.85rem;margin-top:20px;text-align:left;line-height:1.45}
+  .demo-roles{margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .demo-titulo{font-size:.8rem;color:var(--gris);margin:0 0 10px;font-weight:600}
+
+  /* Catálogo */
+  #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+  .tarjeta{background:#fff;border:1px solid var(--borde);border-radius:16px;padding:22px;text-align:left;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 14px rgba(0,0,0,.04);font-weight:400}
+  .tarjeta:hover{opacity:1;transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,60,113,.12);border-color:var(--azul-claro)}
+  .t-titulo{font-weight:700;color:var(--azul);font-size:1.02rem;line-height:1.35}
+  .t-desc{color:var(--gris);font-size:.85rem;line-height:1.45;flex:1}
+  .etiquetas{display:flex;gap:6px;flex-wrap:wrap}
+  .etq{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:3px 8px;border-radius:999px}
+  .etq-todos{background:#dcfce7;color:var(--verde)}
+  .etq-prof{background:#dbeafe;color:var(--azul)}
+  .etq-oculta{background:#fef3c7;color:var(--ambar)}
+  .vacio{color:var(--gris);font-size:.95rem;padding:30px 0}
+
+  /* Visor de app */
+  #visor-barra{display:flex;align-items:center;gap:14px;padding:10px 20px;background:#fff;border-bottom:1px solid var(--borde)}
+  #visor-titulo{font-weight:700;color:var(--azul);font-size:.95rem}
+  #visor-frame{display:block;width:100%;height:calc(100vh - 120px);border:0;background:#fff}
+
+  /* Administración */
+  .pestanas{display:flex;gap:8px;margin-bottom:22px;border-bottom:1px solid var(--borde)}
+  .pestana{background:none;color:var(--gris);border-radius:0;padding:10px 6px;margin-right:14px;border-bottom:3px solid transparent}
+  .pestana.activa{color:var(--azul);border-bottom-color:var(--azul)}
+  .dos-col{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:24px;align-items:start}
+  .panel{background:#fff;border:1px solid var(--borde);border-radius:16px;padding:22px}
+  .panel h3{margin:0;color:var(--azul);font-size:1.05rem}
+  .radios{display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+  .radios label{display:flex;gap:8px;align-items:center;cursor:pointer}
+  .acciones-form{display:flex;gap:10px;margin-top:20px}
+  .fila{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--borde);flex-wrap:wrap}
+  .fila:last-child{border-bottom:none}
+  .fila-info{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .fila-info strong{color:var(--texto);font-size:.92rem;word-break:break-word}
+  .fila-info small{color:var(--gris)}
+  .fila-acc{display:flex;gap:6px;flex-wrap:wrap}
+  .fila-acc button{padding:6px 11px;font-size:.78rem}
+  .cabecera-panel{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--texto);color:#fff;padding:12px 20px;border-radius:10px;font-size:.88rem;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:50;max-width:90vw}
+  #toast.error{background:var(--rojo)}
+
+  @media (max-width:760px){
+    .dos-col{grid-template-columns:1fr}
+    #u-email{display:none}
+    main{padding:20px 16px}
+    .tarjeta-ingreso{padding:30px 22px}
+  }
+</style>
+</head>
+<body>
+
+<div id="aviso-demo" class="hidden">Demo mode: changes are not saved. Add the Firebase settings to this file to use the real platform.</div>
+
+<!-- ============ INGRESO ============ -->
+<section id="p-ingreso">
+  <div class="tarjeta-ingreso">
+    <h1>Teaching Resources Platform</h1>
+    <p>Sign in with your University of Chile Google account.<br>Students: use your @ug.uchile.cl account.</p>
+    <div id="ingreso-real">
+      <button class="btn-google" id="btn-google">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Sign in with Google
+      </button>
+    </div>
+    <div id="ingreso-demo" class="hidden">
+      <p class="demo-titulo">See the platform as:</p>
+      <div class="demo-roles">
+        <button class="btn-prim" data-rol="admin">Admin</button>
+        <button class="btn-prim" data-rol="profesor">Teacher</button>
+        <button class="btn-prim" data-rol="estudiante">Student</button>
+        <button class="btn-sec" data-rol="otro">Account with no access</button>
+      </div>
+    </div>
+    <div id="ingreso-error" class="error hidden"></div>
+  </div>
+</section>
+
+<!-- ============ BARRA SUPERIOR ============ -->
+<header id="barra" class="hidden">
+  <div class="marca">Teaching Resources</div>
+  <nav class="nav">
+    <button class="btn-barra" id="nav-catalogo">Catalog</button>
+    <button class="btn-barra hidden" id="nav-admin">Admin</button>
+    <span id="u-email"></span>
+    <span class="chip" id="u-rol"></span>
+    <button class="btn-barra" id="nav-salir">Sign out</button>
+  </nav>
+</header>
+
+<!-- ============ CATÁLOGO ============ -->
+<main id="p-catalogo" class="hidden">
+  <h2>App catalog</h2>
+  <p class="sub" id="catalogo-sub">Choose an app to open it.</p>
+  <div id="grid"></div>
+</main>
+
+<!-- ============ VISOR DE APP ============ -->
+<section id="p-visor" class="hidden">
+  <div id="visor-barra">
+    <button class="btn-sec" id="btn-volver">← Back</button>
+    <span id="visor-titulo"></span>
+  </div>
+  <iframe id="visor-frame" title="App" sandbox="allow-scripts allow-popups allow-forms allow-modals allow-downloads" allow="fullscreen; autoplay"></iframe>
+</section>
+
+<!-- ============ ADMINISTRACIÓN ============ -->
+<main id="p-admin" class="hidden">
+  <h2>Admin</h2>
+  <p class="sub">Only you can see this page.</p>
+  <div class="pestanas">
+    <button class="pestana activa" data-pestana="apps">Apps</button>
+    <button class="pestana" data-pestana="profes">Teachers</button>
+  </div>
+
+  <!-- Pestaña Apps -->
+  <div id="tab-apps" class="dos-col">
+    <form class="panel" id="form-app" autocomplete="off">
+      <h3 id="form-titulo">New app</h3>
+      <label class="campo" for="f-titulo">Title</label>
+      <input type="text" id="f-titulo" maxlength="120">
+      <label class="campo" for="f-desc">Description</label>
+      <textarea id="f-desc" maxlength="500" placeholder="What is it for? Level, course…"></textarea>
+      <label class="campo">Who can see it?</label>
+      <div class="radios">
+        <label><input type="radio" name="vis" value="all" checked> Everyone (students and teachers)</label>
+        <label><input type="radio" name="vis" value="teachers"> Teachers only</label>
+      </div>
+      <label class="campo" for="f-archivo">App file (.html)</label>
+      <input type="file" id="f-archivo" accept=".html,.htm">
+      <div class="ayuda" id="ayuda-archivo">Max. 900 KB. Put images in Cloudinary and use their links.</div>
+      <div class="acciones-form">
+        <button type="submit" class="btn-prim" id="btn-guardar">Publish app</button>
+        <button type="button" class="btn-sec hidden" id="btn-cancelar">Cancel</button>
+      </div>
+    </form>
+    <div class="panel">
+      <h3>Published apps</h3>
+      <div id="lista-apps"></div>
+    </div>
+  </div>
+
+  <!-- Pestaña Profesores -->
+  <div id="tab-profes" class="dos-col hidden">
+    <div class="panel">
+      <h3>Add teachers</h3>
+      <label class="campo" for="f-profes">Emails (one per line)</label>
+      <textarea id="f-profes" placeholder="name@uchile.cl"></textarea>
+      <div class="ayuda">They must be Google accounts.</div>
+      <div class="acciones-form">
+        <button class="btn-prim" id="btn-agregar-prof">Add</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="cabecera-panel">
+        <h3>Teachers with access</h3>
+        <button class="btn-sec" id="btn-exportar">Export list (CSV)</button>
+      </div>
+      <div id="lista-prof"></div>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="hidden"></div>
+
+<!-- Apps de ejemplo para el modo demostración (no se usan en modo real) -->
+<script id="semilla-demo" type="application/json">
+[
+  {"id":"demo1","title":"Example app for everyone","description":"Students, teachers and the admin can see it.","visibility":"all","html":"<!DOCTYPE html><html><body style='font-family:sans-serif;text-align:center;padding:60px'><h1>Example app</h1><p>Everyone can see this app.</p></body></html>"},
+  {"id":"demo2","title":"Example app for teachers only","description":"Students cannot see it.","visibility":"teachers","html":"<!DOCTYPE html><html><body style='font-family:sans-serif;text-align:center;padding:60px'><h1>This app is for teachers only</h1></body></html>"}
+]
+</script>
+
+<script type="module">
+/* =====================================================================
+   1) CONFIGURACIÓN — Aquí se pega la configuración que entrega Firebase.
+      Mientras diga "PEGAR_AQUI", la plataforma funciona en modo demostración.
+   ===================================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyDlyZEH5G_Md5-YKAivReLV-3RJjzf0opo",
+  authDomain: "plataforma-preintermedio-b1.firebaseapp.com",
+  projectId: "plataforma-preintermedio-b1",
+  storageBucket: "plataforma-preintermedio-b1.firebasestorage.app",
+  messagingSenderId: "664089610163",
+  appId: "1:664089610163:web:f719d0593a4359f385adc6"
+};
+
+const ADMIN_EMAIL = "preintermediate.med@uchile.cl";
+const DOMINIO_ESTUDIANTES = "@ug.uchile.cl";
+const MAX_BYTES = 900000;
+const MODO_DEMO = !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PEGAR");
+
+/* =====================================================================
+   2) ACCESO A DATOS — modo real (Firebase) y modo demostración
+   ===================================================================== */
+async function crearFirebase(){
+  const V = "10.12.2";
+  const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+  const A = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+  const F = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
+  const app = initializeApp(firebaseConfig);
+  const auth = A.getAuth(app);
+  const fs = F.getFirestore(app);
+  return {
+    onUser(cb){
+      A.onAuthStateChanged(auth, u => cb(u ? { email: (u.email||"").toLowerCase() } : null));
+    },
+    async login(){
+      const p = new A.GoogleAuthProvider();
+      p.setCustomParameters({ prompt: "select_account" });
+      await A.signInWithPopup(auth, p);
+    },
+    async logout(){ await A.signOut(auth); },
+    async esProfesor(email){
+      const s = await F.getDoc(F.doc(fs, "teachers", email));
+      return s.exists();
+    },
+    async listarApps(rol){
+      const col = F.collection(fs, "apps");
+      let q = col;
+      if (rol === "profesor") q = F.query(col, F.where("hidden", "==", false));
+      if (rol === "estudiante") q = F.query(col, F.where("hidden", "==", false), F.where("visibility", "==", "all"));
+      const s = await F.getDocs(q);
+      return s.docs.map(d => ({ id: d.id, ...d.data() }));
+    },
+    async contenidoApp(id){
+      const s = await F.getDoc(F.doc(fs, "appContent", id));
+      return s.exists() ? s.data().html : null;
+    },
+    async guardarApp({ id, title, description, visibility, hidden }, html){
+      const ref = id ? F.doc(fs, "apps", id) : F.doc(F.collection(fs, "apps"));
+      const b = F.writeBatch(fs);
+      const meta = { title, description, visibility, hidden: !!hidden, updatedAt: Date.now() };
+      if (!id) meta.createdAt = Date.now();
+      b.set(ref, meta, { merge: true });
+      const cref = F.doc(fs, "appContent", ref.id);
+      if (html != null) b.set(cref, { html, visibility, hidden: !!hidden });
+      else b.set(cref, { visibility, hidden: !!hidden }, { merge: true });
+      await b.commit();
+      return ref.id;
+    },
+    async borrarApp(id){
+      const b = F.writeBatch(fs);
+      b.delete(F.doc(fs, "apps", id));
+      b.delete(F.doc(fs, "appContent", id));
+      await b.commit();
+    },
+    async listarProfesores(){
+      const s = await F.getDocs(F.collection(fs, "teachers"));
+      return s.docs.map(d => ({ email: d.id, ...d.data() }));
+    },
+    async agregarProfesores(emails){
+      const b = F.writeBatch(fs);
+      emails.forEach(e => b.set(F.doc(fs, "teachers", e), { addedAt: Date.now() }));
+      await b.commit();
+    },
+    async quitarProfesor(email){ await F.deleteDoc(F.doc(fs, "teachers", email)); }
+  };
+}
+
+function crearDemo(){
+  let cb = null;
+  let semilla = [];
+  try { semilla = JSON.parse(document.getElementById("semilla-demo").textContent); } catch(e) {}
+  const apps = semilla.map(a => ({ hidden: false, createdAt: Date.now(), ...a }));
+  const profesores = new Map([["profesora.demo@uchile.cl", Date.now()]]);
+  const correos = {
+    admin: ADMIN_EMAIL,
+    profesor: "profesora.demo@uchile.cl",
+    estudiante: "estudiante.demo@ug.uchile.cl",
+    otro: "alguien@gmail.com"
+  };
+  const espera = () => new Promise(r => setTimeout(r, 150));
+  return {
+    onUser(f){ cb = f; f(null); },
+    async loginDemo(rol){ await espera(); cb({ email: correos[rol] }); },
+    async logout(){ cb(null); },
+    async esProfesor(e){ return profesores.has(e); },
+    async listarApps(rol){
+      await espera();
+      return apps.filter(a => rol === "admin" || (!a.hidden && (rol === "profesor" || a.visibility === "all")))
+                 .map(({ html, ...m }) => m);
+    },
+    async contenidoApp(id){ const a = apps.find(x => x.id === id); return a ? a.html : null; },
+    async guardarApp(m, html){
+      await espera();
+      if (m.id){
+        const a = apps.find(x => x.id === m.id);
+        Object.assign(a, { title: m.title, description: m.description, visibility: m.visibility, hidden: !!m.hidden });
+        if (html != null) a.html = html;
+        return a.id;
+      }
+      const id = "app" + Date.now();
+      apps.push({ id, title: m.title, description: m.description, visibility: m.visibility, hidden: false, html, createdAt: Date.now() });
+      return id;
+    },
+    async borrarApp(id){ const i = apps.findIndex(x => x.id === id); if (i >= 0) apps.splice(i, 1); },
+    async listarProfesores(){ return [...profesores].map(([email, addedAt]) => ({ email, addedAt })); },
+    async agregarProfesores(emails){ emails.forEach(e => profesores.set(e, Date.now())); },
+    async quitarProfesor(e){ profesores.delete(e); }
+  };
+}
+
+/* =====================================================================
+   3) INTERFAZ
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const porTitulo = (a, b) => (a.title || "").localeCompare(b.title || "", "es");
+const RE_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ROL_TXT = { admin: "Admin", profesor: "Teacher", estudiante: "Student" };
+
+let datos;
+let sesion = {};
+let appsAdmin = [];
+let editandoId = null;
+let origenVisor = "catalogo";
+
+function mostrar(p){
+  ["ingreso", "catalogo", "visor", "admin"].forEach(n => $("#p-" + n).classList.toggle("hidden", n !== p));
+  $("#barra").classList.toggle("hidden", p === "ingreso");
+  $("#nav-catalogo").classList.toggle("activo", p === "catalogo");
+  $("#nav-admin").classList.toggle("activo", p === "admin");
+  if (p !== "visor") $("#visor-frame").srcdoc = "";
+  window.scrollTo(0, 0);
+}
+
+let toastTimer;
+function toast(msg, tipo = "ok"){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = tipo === "error" ? "error" : "";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add("hidden"), 4000);
+}
+
+function boton(txt, clase, fn){
+  const b = document.createElement("button");
+  b.type = "button"; b.className = clase; b.textContent = txt; b.onclick = fn;
+  return b;
+}
+
+function etiquetas(a, conOculta){
+  let h = a.visibility === "teachers"
+    ? '<span class="etq etq-prof">Teachers only</span>'
+    : '<span class="etq etq-todos">Everyone</span>';
+  if (conOculta && a.hidden) h += '<span class="etq etq-oculta">Hidden</span>';
+  return h;
+}
+
+function mostrarErrorIngreso(msg){
+  const e = $("#ingreso-error");
+  e.textContent = msg;
+  e.classList.remove("hidden");
+}
+
+async function determinarRol(email){
+  if (email === ADMIN_EMAIL) return "admin";
+  if (email.endsWith(DOMINIO_ESTUDIANTES)) return "estudiante";
+  if (await datos.esProfesor(email)) return "profesor";
+  return null;
+}
+
+async function alCambiarUsuario(u){
+  if (!u){ sesion = {}; mostrar("ingreso"); return; }
+  try {
+    const rol = await determinarRol(u.email);
+    if (!rol){
+      mostrarErrorIngreso(`The account ${u.email} cannot use this platform. Students: sign in with your @ug.uchile.cl account. Teachers: ask the admin for access.`);
+      await datos.logout();
+      return;
+    }
+    sesion = { ...u, rol };
+    $("#ingreso-error").classList.add("hidden");
+    $("#u-email").textContent = u.email;
+    $("#u-rol").textContent = ROL_TXT[rol];
+    $("#nav-admin").classList.toggle("hidden", rol !== "admin");
+    await irCatalogo();
+  } catch(e){
+    console.error(e);
+    mostrarErrorIngreso("Something went wrong. Please try again in a few minutes.");
+    await datos.logout();
+  }
+}
+
+/* ---------- Catálogo ---------- */
+async function irCatalogo(){
+  mostrar("catalogo");
+  $("#catalogo-sub").textContent = sesion.rol === "estudiante"
+    ? "Choose an app to open it."
+    : "Choose an app to open it. The label shows who can see it.";
+  const grid = $("#grid");
+  grid.innerHTML = '<p class="vacio">Loading…</p>';
+  let apps;
+  try {
+    apps = (await datos.listarApps(sesion.rol === "admin" ? "profesor" : sesion.rol)).sort(porTitulo);
+  } catch(e){
+    console.error(e);
+    grid.innerHTML = '<p class="vacio">We could not load the catalog.</p>';
+    return;
+  }
+  if (!apps.length){ grid.innerHTML = '<p class="vacio">There are no apps yet.</p>'; return; }
+  grid.innerHTML = "";
+  apps.forEach(a => {
+    const c = document.createElement("button");
+    c.className = "tarjeta";
+    c.innerHTML = `<span class="t-titulo">${esc(a.title)}</span>
+      <span class="t-desc">${esc(a.description)}</span>
+      ${sesion.rol !== "estudiante" ? `<span class="etiquetas">${etiquetas(a)}</span>` : ""}`;
+    c.onclick = () => abrirApp(a, "catalogo");
+    grid.append(c);
+  });
+}
+
+async function abrirApp(a, origen){
+  origenVisor = origen;
+  mostrar("visor");
+  $("#visor-titulo").textContent = a.title;
+  const fr = $("#visor-frame");
+  fr.srcdoc = '<p style="font-family:sans-serif;padding:24px;color:#64748b">Loading…</p>';
+  try {
+    const html = await datos.contenidoApp(a.id);
+    if (html == null) throw new Error("sin contenido");
+    fr.srcdoc = html;
+  } catch(e){
+    console.error(e);
+    fr.srcdoc = '<p style="font-family:sans-serif;padding:24px;color:#dc2626">We could not open this app.</p>';
+  }
+}
+
+/* ---------- Administración: Apps ---------- */
+function irAdmin(){ mostrar("admin"); cambiarPestana("apps"); }
+
+function cambiarPestana(t){
+  document.querySelectorAll(".pestana").forEach(b => b.classList.toggle("activa", b.dataset.pestana === t));
+  $("#tab-apps").classList.toggle("hidden", t !== "apps");
+  $("#tab-profes").classList.toggle("hidden", t !== "profes");
+  if (t === "apps") renderAdminApps(); else renderProfesores();
+}
+
+async function renderAdminApps(){
+  const lista = $("#lista-apps");
+  lista.innerHTML = '<p class="vacio">Loading…</p>';
+  try { appsAdmin = (await datos.listarApps("admin")).sort(porTitulo); }
+  catch(e){ console.error(e); lista.innerHTML = '<p class="vacio">We could not load the list.</p>'; return; }
+  if (!appsAdmin.length){ lista.innerHTML = '<p class="vacio">You have no apps yet.</p>'; return; }
+  lista.innerHTML = "";
+  appsAdmin.forEach(a => {
+    const f = document.createElement("div");
+    f.className = "fila";
+    f.innerHTML = `<div class="fila-info"><strong>${esc(a.title)}</strong><span class="etiquetas">${etiquetas(a, true)}</span></div><div class="fila-acc"></div>`;
+    f.querySelector(".fila-acc").append(
+      boton("Open", "btn-sec", () => abrirApp(a, "admin")),
+      boton("Edit", "btn-sec", () => editarApp(a)),
+      boton(a.hidden ? "Show" : "Hide", "btn-sec", () => alternarOculta(a)),
+      boton("Delete", "btn-peligro", () => borrarApp(a))
+    );
+    lista.append(f);
+  });
+}
+
+function limpiarForm(){
+  editandoId = null;
+  $("#form-app").reset();
+  $("#form-titulo").textContent = "New app";
+  $("#btn-guardar").textContent = "Publish app";
+  $("#btn-cancelar").classList.add("hidden");
+  $("#ayuda-archivo").textContent = "Max. 900 KB. Put images in Cloudinary and use their links.";
+}
+
+function editarApp(a){
+  editandoId = a.id;
+  $("#f-titulo").value = a.title || "";
+  $("#f-desc").value = a.description || "";
+  document.querySelector(`input[name="vis"][value="${a.visibility}"]`).checked = true;
+  $("#f-archivo").value = "";
+  $("#form-titulo").textContent = "Edit app";
+  $("#btn-guardar").textContent = "Save changes";
+  $("#btn-cancelar").classList.remove("hidden");
+  $("#ayuda-archivo").textContent = "Leave this empty to keep the same file. Choose a new file to change it.";
+  $("#form-app").scrollIntoView({ behavior: "smooth" });
+}
+
+async function alternarOculta(a){
+  try {
+    await datos.guardarApp({ ...a, hidden: !a.hidden }, null);
+    toast(a.hidden ? "The app is visible again." : "The app is hidden. Only you can see it.");
+    renderAdminApps();
+  } catch(e){ console.error(e); toast("We could not change it: " + e.message, "error"); }
+}
+
+async function borrarApp(a){
+  if (!confirm(`Delete "${a.title}"? You cannot undo this.`)) return;
+  try {
+    await datos.borrarApp(a.id);
+    if (editandoId === a.id) limpiarForm();
+    toast("App deleted.");
+    renderAdminApps();
+  } catch(e){ console.error(e); toast("We could not delete it: " + e.message, "error"); }
+}
+
+$("#form-app").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const title = $("#f-titulo").value.trim();
+  const description = $("#f-desc").value.trim();
+  const visibility = document.querySelector('input[name="vis"]:checked').value;
+  const file = $("#f-archivo").files[0];
+  if (!title) return toast("Please write a title.", "error");
+  if (!editandoId && !file) return toast("Please choose the .html file for the app.", "error");
+  let html = null;
+  if (file){
+    if (!/\.html?$/i.test(file.name)) return toast("The file must end in .html", "error");
+    if (file.size > MAX_BYTES) return toast("The file is bigger than 900 KB. Check if it has images inside.", "error");
+    html = await file.text();
+  }
+  const previa = editandoId ? appsAdmin.find(x => x.id === editandoId) : null;
+  const btn = $("#btn-guardar");
+  btn.disabled = true;
+  try {
+    await datos.guardarApp({ id: editandoId, title, description, visibility, hidden: previa ? previa.hidden : false }, html);
+    toast(editandoId ? "Changes saved." : "App published.");
+    limpiarForm();
+    renderAdminApps();
+  } catch(e){
+    console.error(e);
+    toast("We could not save it: " + e.message, "error");
+  } finally { btn.disabled = false; }
+});
+$("#btn-cancelar").onclick = limpiarForm;
+
+/* ---------- Administración: Profesores ---------- */
+let profesCache = [];
+async function renderProfesores(){
+  const lista = $("#lista-prof");
+  lista.innerHTML = '<p class="vacio">Loading…</p>';
+  try { profesCache = (await datos.listarProfesores()).sort((a, b) => a.email.localeCompare(b.email)); }
+  catch(e){ console.error(e); lista.innerHTML = '<p class="vacio">We could not load the list.</p>'; return; }
+  if (!profesCache.length){ lista.innerHTML = '<p class="vacio">There are no teachers yet.</p>'; return; }
+  lista.innerHTML = "";
+  profesCache.forEach(p => {
+    const f = document.createElement("div");
+    f.className = "fila";
+    const fecha = p.addedAt ? new Date(p.addedAt).toLocaleDateString("en-GB") : "";
+    f.innerHTML = `<div class="fila-info"><strong>${esc(p.email)}</strong><small>Added: ${esc(fecha)}</small></div><div class="fila-acc"></div>`;
+    f.querySelector(".fila-acc").append(boton("Remove", "btn-peligro", async () => {
+      if (!confirm(`Remove access for ${p.email}?`)) return;
+      try { await datos.quitarProfesor(p.email); toast("Access removed."); renderProfesores(); }
+      catch(e){ console.error(e); toast("We could not remove it: " + e.message, "error"); }
+    }));
+    lista.append(f);
+  });
+}
+
+$("#btn-agregar-prof").onclick = async () => {
+  const entradas = $("#f-profes").value.split(/[\s,;]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+  if (!entradas.length) return toast("Please write at least one email.", "error");
+  const invalidos = entradas.filter(e => !RE_CORREO.test(e));
+  const excluidos = entradas.filter(e => RE_CORREO.test(e) && (e === ADMIN_EMAIL || e.endsWith(DOMINIO_ESTUDIANTES)));
+  const validos = [...new Set(entradas.filter(e => RE_CORREO.test(e) && !excluidos.includes(e)))];
+  if (!validos.length){
+    return toast(excluidos.length
+      ? "@ug.uchile.cl accounts are always students. You cannot add them as teachers."
+      : "These emails are not valid.", "error");
+  }
+  const btn = $("#btn-agregar-prof");
+  btn.disabled = true;
+  try {
+    await datos.agregarProfesores(validos);
+    let msg = `Teachers added: ${validos.length}.`;
+    if (invalidos.length) msg += ` Emails not valid: ${invalidos.length}.`;
+    if (excluidos.length) msg += ` Student or admin emails not added: ${excluidos.length}.`;
+    toast(msg);
+    $("#f-profes").value = "";
+    renderProfesores();
+  } catch(e){
+    console.error(e);
+    toast("We could not add them: " + e.message, "error");
+  } finally { btn.disabled = false; }
+};
+
+$("#btn-exportar").onclick = () => {
+  if (!profesCache.length) return toast("The list is empty.", "error");
+  const filas = ["email,date_added", ...profesCache.map(p => `${p.email},${p.addedAt ? new Date(p.addedAt).toISOString().slice(0, 10) : ""}`)];
+  const blob = new Blob(["\ufeff" + filas.join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "teachers.csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
+/* ---------- Navegación ---------- */
+$("#nav-catalogo").onclick = irCatalogo;
+$("#nav-admin").onclick = irAdmin;
+$("#nav-salir").onclick = () => datos.logout();
+$("#btn-volver").onclick = () => origenVisor === "admin" ? irAdmin() : irCatalogo();
+document.querySelectorAll(".pestana").forEach(b => b.onclick = () => cambiarPestana(b.dataset.pestana));
+
+/* =====================================================================
+   4) ARRANQUE
+   ===================================================================== */
+(async function iniciar(){
+  if (MODO_DEMO){
+    datos = crearDemo();
+    $("#aviso-demo").classList.remove("hidden");
+    $("#ingreso-real").classList.add("hidden");
+    $("#ingreso-demo").classList.remove("hidden");
+    document.querySelectorAll("#ingreso-demo [data-rol]").forEach(b => b.onclick = () => {
+      $("#ingreso-error").classList.add("hidden");
+      datos.loginDemo(b.dataset.rol);
+    });
+  } else {
+    try { datos = await crearFirebase(); }
+    catch(e){ console.error(e); mostrarErrorIngreso("We could not connect. Please check your internet connection."); return; }
+    $("#btn-google").onclick = async () => {
+      $("#ingreso-error").classList.add("hidden");
+      try { await datos.login(); }
+      catch(e){
+        if (e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request"){
+          console.error(e);
+          mostrarErrorIngreso("We could not sign you in. If your browser blocked the pop-up window, allow it and try again.");
+        }
+      }
+    };
+  }
+  datos.onUser(alCambiarUsuario);
+})();
+</script>
+</body>
+</html>
