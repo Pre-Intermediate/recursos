@@ -88,6 +88,10 @@
   .fila-acc button{padding:6px 11px;font-size:.78rem}
   .cabecera-panel{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
 
+  #ver-como{font-family:inherit;font-size:.8rem;font-weight:600;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:7px 10px;cursor:pointer}
+  #ver-como option{color:var(--texto);background:#fff}
+  #aviso-vista{background:#e0f2fe;color:var(--azul);display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:8px 16px;font-size:.85rem;font-weight:600}
+  #aviso-vista button{padding:5px 12px;font-size:.78rem}
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--texto);color:#fff;padding:12px 20px;border-radius:10px;font-size:.88rem;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:50;max-width:90vw}
   #toast.error{background:var(--rojo)}
 
@@ -133,11 +137,21 @@
   <nav class="nav">
     <button class="btn-barra" id="nav-catalogo">Catalog</button>
     <button class="btn-barra hidden" id="nav-admin">Admin</button>
+    <select id="ver-como" class="hidden" aria-label="View as">
+      <option value="">View as: Admin</option>
+      <option value="profesor">View as: Teacher</option>
+      <option value="estudiante">View as: Student</option>
+    </select>
     <span id="u-email"></span>
     <span class="chip" id="u-rol"></span>
     <button class="btn-barra" id="nav-salir">Sign out</button>
   </nav>
 </header>
+
+<div id="aviso-vista" class="hidden">
+  <span id="aviso-vista-texto"></span>
+  <button class="btn-sec" id="btn-salir-vista">Back to my view</button>
+</div>
 
 <!-- ============ CATÁLOGO ============ -->
 <main id="p-catalogo" class="hidden">
@@ -366,10 +380,13 @@ let sesion = {};
 let appsAdmin = [];
 let editandoId = null;
 let origenVisor = "catalogo";
+let vistaComo = "";   // "" = vista normal; "profesor" o "estudiante" = vista previa del admin
+const rolVisible = () => vistaComo || sesion.rol;
 
 function mostrar(p){
   ["ingreso", "catalogo", "visor", "admin"].forEach(n => $("#p-" + n).classList.toggle("hidden", n !== p));
   $("#barra").classList.toggle("hidden", p === "ingreso");
+  $("#aviso-vista").classList.toggle("hidden", p === "ingreso" || !vistaComo);
   $("#nav-catalogo").classList.toggle("activo", p === "catalogo");
   $("#nav-admin").classList.toggle("activo", p === "admin");
   if (p !== "visor") $("#visor-frame").srcdoc = "";
@@ -413,7 +430,7 @@ async function determinarRol(email){
 }
 
 async function alCambiarUsuario(u){
-  if (!u){ sesion = {}; mostrar("ingreso"); return; }
+  if (!u){ sesion = {}; vistaComo = ""; $("#ver-como").value = ""; mostrar("ingreso"); return; }
   try {
     const rol = await determinarRol(u.email);
     if (!rol){
@@ -425,7 +442,8 @@ async function alCambiarUsuario(u){
     $("#ingreso-error").classList.add("hidden");
     $("#u-email").textContent = u.email;
     $("#u-rol").textContent = ROL_TXT[rol];
-    $("#nav-admin").classList.toggle("hidden", rol !== "admin");
+    $("#ver-como").classList.toggle("hidden", rol !== "admin");
+    aplicarVista();
     await irCatalogo();
   } catch(e){
     console.error(e);
@@ -437,14 +455,14 @@ async function alCambiarUsuario(u){
 /* ---------- Catálogo ---------- */
 async function irCatalogo(){
   mostrar("catalogo");
-  $("#catalogo-sub").textContent = sesion.rol === "estudiante"
+  $("#catalogo-sub").textContent = rolVisible() === "estudiante"
     ? "Choose an app to open it."
     : "Choose an app to open it. The label shows who can see it.";
   const grid = $("#grid");
   grid.innerHTML = '<p class="vacio">Loading…</p>';
   let apps;
   try {
-    apps = (await datos.listarApps(sesion.rol === "admin" ? "profesor" : sesion.rol)).sort(porTitulo);
+    apps = (await datos.listarApps(rolVisible() === "admin" ? "profesor" : rolVisible())).sort(porTitulo);
   } catch(e){
     console.error(e);
     grid.innerHTML = '<p class="vacio">We could not load the catalog.</p>';
@@ -457,7 +475,7 @@ async function irCatalogo(){
     c.className = "tarjeta";
     c.innerHTML = `<span class="t-titulo">${esc(a.title)}</span>
       <span class="t-desc">${esc(a.description)}</span>
-      ${sesion.rol !== "estudiante" ? `<span class="etiquetas">${etiquetas(a)}</span>` : ""}`;
+      ${rolVisible() !== "estudiante" ? `<span class="etiquetas">${etiquetas(a)}</span>` : ""}`;
     c.onclick = () => abrirApp(a, "catalogo");
     grid.append(c);
   });
@@ -644,6 +662,17 @@ $("#btn-exportar").onclick = () => {
 $("#nav-catalogo").onclick = irCatalogo;
 $("#nav-admin").onclick = irAdmin;
 $("#nav-salir").onclick = () => datos.logout();
+$("#ver-como").onchange = e => { vistaComo = e.target.value; aplicarVista(); irCatalogo(); };
+$("#btn-salir-vista").onclick = () => { vistaComo = ""; $("#ver-como").value = ""; aplicarVista(); irCatalogo(); };
+
+function aplicarVista(){
+  const rol = rolVisible();
+  $("#u-rol").textContent = ROL_TXT[rol];
+  $("#nav-admin").classList.toggle("hidden", rol !== "admin");
+  $("#aviso-vista-texto").textContent = vistaComo
+    ? `Preview: you see the platform like a ${ROL_TXT[vistaComo].toLowerCase()}.`
+    : "";
+}
 $("#btn-volver").onclick = () => origenVisor === "admin" ? irAdmin() : irCatalogo();
 document.querySelectorAll(".pestana").forEach(b => b.onclick = () => cambiarPestana(b.dataset.pestana));
 
