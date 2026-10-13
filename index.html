@@ -67,7 +67,9 @@
   /* Visor de app */
   #visor-barra{display:flex;align-items:center;gap:14px;padding:10px 20px;background:#fff;border-bottom:1px solid var(--borde)}
   #visor-titulo{font-weight:700;color:var(--azul);font-size:.95rem}
-  #visor-frame{display:block;width:100%;height:calc(100vh - 120px);border:0;background:#fff}
+  #visor-cont iframe{display:block;width:100%;height:70vh;border:0;background:#fff}
+  #visor-estado{font-size:.95rem;color:var(--gris);padding:24px 20px;margin:0}
+  #visor-estado.error{color:var(--rojo)}
 
   /* Administración */
   .pestanas{display:flex;gap:8px;margin-bottom:22px;border-bottom:1px solid var(--borde)}
@@ -166,7 +168,8 @@
     <button class="btn-sec" id="btn-volver">← Back</button>
     <span id="visor-titulo"></span>
   </div>
-  <iframe id="visor-frame" title="App" sandbox="allow-scripts allow-popups allow-forms allow-modals allow-downloads" allow="fullscreen; autoplay"></iframe>
+  <p id="visor-estado" class="hidden"></p>
+  <div id="visor-cont"></div>
 </section>
 
 <!-- ============ ADMINISTRACIÓN ============ -->
@@ -389,7 +392,7 @@ function mostrar(p){
   $("#aviso-vista").classList.toggle("hidden", p === "ingreso" || !vistaComo);
   $("#nav-catalogo").classList.toggle("activo", p === "catalogo");
   $("#nav-admin").classList.toggle("activo", p === "admin");
-  if (p !== "visor") $("#visor-frame").srcdoc = "";
+  if (p !== "visor") $("#visor-cont").innerHTML = "";
   window.scrollTo(0, 0);
 }
 
@@ -485,17 +488,39 @@ async function abrirApp(a, origen){
   origenVisor = origen;
   mostrar("visor");
   $("#visor-titulo").textContent = a.title;
-  const fr = $("#visor-frame");
-  fr.srcdoc = '<p style="font-family:sans-serif;padding:24px;color:#64748b">Loading…</p>';
+  const cont = $("#visor-cont");
+  const estado = $("#visor-estado");
+  cont.innerHTML = "";
+  estado.textContent = "Loading…";
+  estado.className = "";
   try {
     const html = await datos.contenidoApp(a.id);
     if (html == null) throw new Error("sin contenido");
+    // Un recuadro nuevo cada vez: el contenido se asigna antes de insertarlo en la página
+    const fr = document.createElement("iframe");
+    fr.title = a.title || "App";
+    fr.setAttribute("sandbox", "allow-scripts allow-popups allow-forms allow-modals allow-downloads");
+    fr.setAttribute("allow", "fullscreen; autoplay");
     fr.srcdoc = html;
+    cont.append(fr);
+    estado.className = "hidden";
+    ajustarVisor();
   } catch(e){
     console.error(e);
-    fr.srcdoc = '<p style="font-family:sans-serif;padding:24px;color:#dc2626">We could not open this app.</p>';
+    estado.textContent = "We could not open this app.";
+    estado.className = "error";
   }
 }
+
+// El recuadro de la app ocupa exactamente el espacio visible bajo las barras
+function ajustarVisor(){
+  const fr = $("#visor-cont iframe");
+  if (!fr) return;
+  window.scrollTo(0, 0);
+  const alto = window.innerHeight - fr.getBoundingClientRect().top;
+  fr.style.height = Math.max(alto, 300) + "px";
+}
+window.addEventListener("resize", ajustarVisor);
 
 /* ---------- Administración: Apps ---------- */
 function irAdmin(){ mostrar("admin"); cambiarPestana("apps"); }
